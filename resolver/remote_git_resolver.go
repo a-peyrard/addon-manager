@@ -41,7 +41,7 @@ func (g *remoteGitResolver) Resolve(addonName string, version string) (found boo
 	matches := extractorRegex.FindStringSubmatch(addonName)
 	repo := matches[1]
 	pathInRepo := ""
-	if len(matches) > 2 {
+	if len(matches) > 2 && matches[2] != "" {
 		pathInRepo = matches[2][1:]
 	}
 
