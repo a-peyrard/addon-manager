@@ -59,6 +59,16 @@ func (d *defaultCompiler) Compile(repoPath, pathInRepo string) (compiledLibPath 
 	commandArgs = append(commandArgs, compiledLibPath)
 	commandArgs = append(commandArgs, generateBuildPath(repoPath, pathInRepo, descriptor))
 
+	err = hackGoMod(repoPath)
+	if err != nil {
+		return
+	}
+	defer func() {
+		unHackErr := unHackGoMod(repoPath)
+		if unHackErr != nil {
+			err = unHackErr
+		}
+	}()
 	err = execCompilationCommand(repoPath, commandArgs)
 
 	if err != nil {

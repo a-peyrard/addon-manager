@@ -33,9 +33,8 @@ func main() {
 		}),
 		FactoryMethod: "NewProcess",
 	})
-	proc, err := processLoader.Load(addonName, version)
 
-	//proc, err := LoadProcess[process.Process](os.Args[1], "NewProcess")
+	proc, err := processLoader.Load(addonName, version)
 	if err != nil {
 		panic(err)
 	}
