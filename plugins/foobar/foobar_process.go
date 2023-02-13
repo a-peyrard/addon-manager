@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"teut.inc/process-engine/process"
+	"github.com/a-peyrard/addon-manager/process"
 )
 
 type Process struct{}

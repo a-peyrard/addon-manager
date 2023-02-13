@@ -2,14 +2,14 @@ package resolver
 
 import (
 	"fmt"
+	"github.com/a-peyrard/addon-manager/compiler"
+	"github.com/a-peyrard/addon-manager/repository"
 	"github.com/hashicorp/go-getter"
 	"log"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
-	"teut.inc/process-engine/compiler"
-	"teut.inc/process-engine/repository"
 )
 
 var extractorRegex = regexp.MustCompile("^(.*?/.*?/.*?)(/.*)?$")

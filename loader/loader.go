@@ -2,9 +2,9 @@ package loader
 
 import (
 	"fmt"
+	"github.com/a-peyrard/addon-manager/resolver"
 	"plugin"
 	"reflect"
-	"teut.inc/process-engine/resolver"
 )
 
 type Config struct {

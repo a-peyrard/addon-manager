@@ -2,12 +2,12 @@ package main
 
 import (
 	"fmt"
+	"github.com/a-peyrard/addon-manager/compiler"
+	"github.com/a-peyrard/addon-manager/loader"
+	"github.com/a-peyrard/addon-manager/process"
+	"github.com/a-peyrard/addon-manager/repository"
+	"github.com/a-peyrard/addon-manager/resolver"
 	"os"
-	"teut.inc/process-engine/compiler"
-	"teut.inc/process-engine/loader"
-	"teut.inc/process-engine/process"
-	"teut.inc/process-engine/repository"
-	"teut.inc/process-engine/resolver"
 )
 
 func main() {

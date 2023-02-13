@@ -1,10 +1,10 @@
 package repository
 
 import (
+	"github.com/a-peyrard/addon-manager/util/file"
 	"os"
 	"path/filepath"
 	"runtime"
-	"teut.inc/process-engine/util/file"
 )
 
 const libraryFileName = "lib.so"

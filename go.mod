@@ -1,4 +1,4 @@
-module teut.inc/process-engine
+module github.com/a-peyrard/addon-manager
 
 go 1.19
 
