@@ -8,9 +8,9 @@ func NewAnyResolver(resolvers []Resolver) Resolver {
 	return &anyResolver{resolvers: resolvers}
 }
 
-func (a *anyResolver) Resolve(packageName string, version string) (found bool, path string, err error) {
+func (a *anyResolver) Resolve(addonName string, version string) (found bool, path string, err error) {
 	for _, r := range a.resolvers {
-		found, path, err = r.Resolve(packageName, version)
+		found, path, err = r.Resolve(addonName, version)
 		if found || err != nil {
 			break
 		}

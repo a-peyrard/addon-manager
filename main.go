@@ -36,7 +36,7 @@ func main() {
 			os.Args[0])
 		os.Exit(1)
 	}
-	packageName := os.Args[1]
+	addonName := os.Args[1]
 	version := "latest"
 	if len(os.Args) > 2 {
 		version = os.Args[2]
@@ -48,7 +48,7 @@ func main() {
 		}),
 		FactoryMethod: "NewProcess",
 	})
-	proc, err := processLoader.Load(packageName, version)
+	proc, err := processLoader.Load(addonName, version)
 
 	//proc, err := LoadProcess[process.Process](os.Args[1], "NewProcess")
 	if err != nil {

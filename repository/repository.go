@@ -1,5 +1,5 @@
 package repository
 
 type Repository interface {
-	Store()
+	Store(addonPath string, addonName string, version string) error
 }

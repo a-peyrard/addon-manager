@@ -25,14 +25,14 @@ func NewLoader[T any](config *Config) *loader[T] {
 	}
 }
 
-func (l *loader[T]) Load(packageName string, version string) (T, error) {
+func (l *loader[T]) Load(addonName string, version string) (T, error) {
 	var nilValue T
-	found, path, err := l.resolver.Resolve(packageName, version)
+	found, path, err := l.resolver.Resolve(addonName, version)
 	if err != nil {
 		return nilValue, err
 	}
 	if !found {
-		return nilValue, fmt.Errorf("unable to find %s on version %s", packageName, version)
+		return nilValue, fmt.Errorf("unable to find %s on version %s", addonName, version)
 	}
 	p, err := plugin.Open(path)
 	if err != nil {
