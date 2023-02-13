@@ -1,0 +1,6 @@
+[addon]
+name = "foobar"
+version = "1.0.0"
+
+[addon.build]
+path = "plugins/foobar/foobar_process.go"

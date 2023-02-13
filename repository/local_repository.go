@@ -1,10 +1,10 @@
 package repository
 
 import (
-	"io"
 	"os"
 	"path/filepath"
 	"runtime"
+	"teut.inc/process-engine/util/file"
 )
 
 const libraryFileName = "lib.so"
@@ -39,13 +39,14 @@ func (l *localRepository) Resolve(
 	return
 }
 
-func (l *localRepository) Store(tmpAddonPath string, addonName string, version string) (err error) {
-	destinationPath := l.generateAddonPath(addonName, version)
-	err = os.MkdirAll(destinationPath, 0750)
-	if err != nil {
-		return
+func (l *localRepository) Store(tmpAddonPath string, addonName string, version string) (path string, err error) {
+	path = l.generateAddonPath(addonName, version)
+	err = os.MkdirAll(path, 0750)
+	if err == nil {
+		err = file.Copy(tmpAddonPath, path)
 	}
-	return copyFile(tmpAddonPath, destinationPath)
+
+	return
 }
 
 func (l *localRepository) generateAddonPath(addonName string, version string) string {
@@ -55,29 +56,4 @@ func (l *localRepository) generateAddonPath(addonName string, version string) st
 	}
 
 	return filepath.Join(l.workingDirectory, addonName, version, l.arch, flags, libraryFileName)
-}
-
-func copyFile(src, dst string) (err error) {
-	in, err := os.Open(src)
-	if err != nil {
-		return
-	}
-	defer func() {
-		_ = in.Close()
-	}()
-	out, err := os.Create(dst)
-	if err != nil {
-		return
-	}
-	defer func() {
-		closeErr := out.Close()
-		if err == nil {
-			err = closeErr
-		}
-	}()
-	if _, err = io.Copy(out, in); err != nil {
-		return
-	}
-	err = out.Sync()
-	return
 }

@@ -3,32 +3,12 @@ package main
 import (
 	"fmt"
 	"os"
-	"plugin"
+	"teut.inc/process-engine/compiler"
 	"teut.inc/process-engine/loader"
 	"teut.inc/process-engine/process"
 	"teut.inc/process-engine/repository"
 	"teut.inc/process-engine/resolver"
 )
-
-func LoadProcess[T any](filepath string, factoryMethod string) (T, error) {
-	var nilValue T
-	p, err := plugin.Open(filepath)
-	if err != nil {
-		return nilValue, err
-	}
-
-	symProcess, err := p.Lookup(factoryMethod)
-	if err != nil {
-		return nilValue, err
-	}
-
-	processFactory, ok := symProcess.(func() T)
-	if !ok {
-		return nilValue, fmt.Errorf("unexpected type from module symbol")
-	}
-
-	return processFactory(), nil
-}
 
 func main() {
 	if len(os.Args) < 2 {
@@ -41,10 +21,15 @@ func main() {
 	if len(os.Args) > 2 {
 		version = os.Args[2]
 	}
+	localRepository := repository.NewLocalRepository("repo.private")
 	processLoader := loader.NewLoader[process.Process](&loader.Config{
 		Resolver: resolver.NewAnyResolver([]resolver.Resolver{
-			repository.NewLocalRepository("repo.private"),
-			resolver.NewGithubResolver(),
+			localRepository,
+			resolver.NewRemoteGitResolver(
+				"/tmp/addon/gitResolver",
+				localRepository,
+				compiler.NewDefaultCompiler("/tmp/addon/buildOutput"),
+			),
 		}),
 		FactoryMethod: "NewProcess",
 	})
@@ -59,5 +44,3 @@ func main() {
 		panic(err)
 	}
 }
-
-//Note: The plugins must be built as shared libraries (.so files on Unix-like systems or .dll files on Windows) for the plugin package to be able to load them.
