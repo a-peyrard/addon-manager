@@ -18,7 +18,12 @@ type BuildDescriptor struct {
 	Path string
 }
 
+type container struct {
+	Addon *Descriptor
+}
+
 func ParseDescriptor(descriptorPath string) (descriptor *Descriptor, err error) {
+	var container container
 	var stat os.FileInfo
 	stat, err = os.Stat(descriptorPath)
 	if err != nil {
@@ -28,7 +33,10 @@ func ParseDescriptor(descriptorPath string) (descriptor *Descriptor, err error) 
 		err = fmt.Errorf("descriptor %s is not a regular file", descriptorPath)
 		return
 	}
-	_, err = toml.DecodeFile(descriptorPath, descriptor)
+	_, err = toml.DecodeFile(descriptorPath, &container)
+	if err == nil {
+		descriptor = container.Addon
+	}
 
 	return
 }

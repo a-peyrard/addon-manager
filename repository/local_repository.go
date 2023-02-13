@@ -41,7 +41,7 @@ func (l *localRepository) Resolve(
 
 func (l *localRepository) Store(tmpAddonPath string, addonName string, version string) (path string, err error) {
 	path = l.generateAddonPath(addonName, version)
-	err = os.MkdirAll(path, 0750)
+	err = os.MkdirAll(filepath.Dir(path), 0750)
 	if err == nil {
 		err = file.Copy(tmpAddonPath, path)
 	}

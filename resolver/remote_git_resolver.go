@@ -12,7 +12,7 @@ import (
 	"teut.inc/process-engine/repository"
 )
 
-var extractorRegex = regexp.MustCompile("(.*?/.*?/.*?)(/.*)?")
+var extractorRegex = regexp.MustCompile("^(.*?/.*?/.*?)(/.*)?$")
 
 type remoteGitResolver struct {
 	workingDirectory string
@@ -42,7 +42,7 @@ func (g *remoteGitResolver) Resolve(addonName string, version string) (found boo
 	repo := matches[1]
 	pathInRepo := ""
 	if len(matches) > 2 {
-		pathInRepo = matches[2]
+		pathInRepo = matches[2][1:]
 	}
 
 	var destination string
@@ -53,7 +53,7 @@ func (g *remoteGitResolver) Resolve(addonName string, version string) (found boo
 
 	// compile the addon
 	var compiledLibPath string
-	compiledLibPath, err = g.compiler.Compile(filepath.Join(destination, pathInRepo))
+	compiledLibPath, err = g.compiler.Compile(destination, pathInRepo)
 	if err != nil {
 		return
 	}
@@ -63,6 +63,7 @@ func (g *remoteGitResolver) Resolve(addonName string, version string) (found boo
 	if err == nil {
 		found = true
 	}
+	// fixme: delete compiled lib
 
 	return
 }
@@ -76,9 +77,14 @@ func (g *remoteGitResolver) downloadRepository(repo string, version string) (des
 	}
 
 	destination = filepath.Join(g.workingDirectory, repo)
+	err = os.MkdirAll(filepath.Dir(destination), 0750)
+	if err != nil {
+		return
+	}
+
 	errors := make([]any, 0)
 	for _, versionToTry := range versionsToTry {
-		if err = getter.Get(repo+"?ref="+versionToTry, destination); err == nil {
+		if err = getter.Get(destination, repo+"?ref="+versionToTry); err == nil {
 			return
 		} else {
 			errors = append(errors, err)

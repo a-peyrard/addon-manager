@@ -46,7 +46,7 @@ func (l *loader[T]) Load(addonName string, version string) (T, error) {
 
 	processFactory, ok := symProcess.(func() T)
 	if !ok {
-		expectedType := reflect.TypeOf(nilValue).Name()
+		expectedType := reflect.TypeOf((*T)(nil)).Name()
 		foundType := reflect.TypeOf(symProcess).Name()
 		return nilValue, fmt.Errorf("unexpected type, got %s but was expecting %s", foundType, expectedType)
 	}
