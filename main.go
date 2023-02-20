@@ -7,6 +7,8 @@ import (
 	"github.com/a-peyrard/addon-manager/process"
 	"github.com/a-peyrard/addon-manager/repository"
 	"github.com/a-peyrard/addon-manager/resolver"
+	"github.com/go-errors/errors"
+	"log"
 	"os"
 )
 
@@ -36,10 +38,10 @@ func main() {
 
 	proc, err := processLoader.Load(addonName, version)
 	if err != nil {
-		panic(err)
+		log.Fatalf(err.(*errors.Error).ErrorStack())
 	}
 
 	if err := proc.Run(); err != nil {
-		panic(err)
+		log.Fatalf(err.(*errors.Error).ErrorStack())
 	}
 }

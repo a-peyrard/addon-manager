@@ -1,8 +1,8 @@
 package compiler
 
 import (
-	"fmt"
 	"github.com/BurntSushi/toml"
+	errors2 "github.com/go-errors/errors"
 	"os"
 )
 
@@ -27,15 +27,18 @@ func ParseDescriptor(descriptorPath string) (descriptor *Descriptor, err error) 
 	var stat os.FileInfo
 	stat, err = os.Stat(descriptorPath)
 	if err != nil {
+		err = errors2.Wrap(err, 1)
 		return
 	}
 	if !stat.Mode().IsRegular() {
-		err = fmt.Errorf("descriptor %s is not a regular file", descriptorPath)
+		err = errors2.Errorf("descriptor %s is not a regular file", descriptorPath)
 		return
 	}
 	_, err = toml.DecodeFile(descriptorPath, &container)
 	if err == nil {
 		descriptor = container.Addon
+	} else {
+		err = errors2.Wrap(err, 1)
 	}
 
 	return

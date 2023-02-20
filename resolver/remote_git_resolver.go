@@ -1,9 +1,9 @@
 package resolver
 
 import (
-	"fmt"
 	"github.com/a-peyrard/addon-manager/compiler"
 	"github.com/a-peyrard/addon-manager/repository"
+	errors2 "github.com/go-errors/errors"
 	"github.com/hashicorp/go-getter"
 	"log"
 	"os"
@@ -79,18 +79,20 @@ func (g *remoteGitResolver) downloadRepository(repo string, version string) (des
 	destination = filepath.Join(g.workingDirectory, repo)
 	err = os.MkdirAll(filepath.Dir(destination), 0750)
 	if err != nil {
+		err = errors2.Wrap(err, 1)
 		return
 	}
 
+	// fixme: use go 1.20 errors.Join
 	errors := make([]any, 0)
 	for _, versionToTry := range versionsToTry {
 		if err = getter.Get(destination, repo+"?ref="+versionToTry); err == nil {
 			return
 		} else {
-			errors = append(errors, err)
+			errors = append(errors, errors2.Wrap(err, 1))
 		}
 	}
 
-	err = fmt.Errorf(strings.Repeat("%w", len(errors)), errors...)
+	err = errors2.Errorf(strings.Repeat("%w", len(errors)), errors...)
 	return
 }

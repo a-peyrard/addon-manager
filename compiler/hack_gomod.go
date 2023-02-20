@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/a-peyrard/addon-manager/util/file"
+	errors2 "github.com/go-errors/errors"
 	"golang.org/x/mod/modfile"
 	"os"
 	"os/exec"
@@ -17,10 +18,10 @@ func hackGoMod(repoPath string) (err error) {
 	if err != nil {
 		return
 	}
-	moduleToHack = strings.TrimSuffix(moduleToHack, "\n")
 
 	currentProjectPath, err = os.Getwd()
 	if err != nil {
+		err = errors2.Wrap(err, 1)
 		return
 	}
 
@@ -35,6 +36,7 @@ func hackGoMod(repoPath string) (err error) {
 	}
 	err = file.Copy(modPath, modBackupPath)
 	if err != nil {
+		err = errors2.Wrap(err, 1)
 		return
 	}
 
@@ -46,6 +48,7 @@ func hackGoMod(repoPath string) (err error) {
 	content, err = os.ReadFile(modPath)
 	parsedFile, err = modfile.Parse(modPath, content, nil)
 	if err != nil {
+		err = errors2.Wrap(err, 1)
 		return
 	}
 
@@ -57,7 +60,7 @@ func hackGoMod(repoPath string) (err error) {
 		}
 	}
 	if version == "" {
-		err = fmt.Errorf("unable to find the version of the current module %s", moduleToHack)
+		err = errors2.Errorf("unable to find the version of the current module %s", moduleToHack)
 		return
 	}
 
@@ -69,6 +72,7 @@ func hackGoMod(repoPath string) (err error) {
 		"",
 	)
 	if err != nil {
+		err = errors2.Wrap(err, 1)
 		return
 	}
 
@@ -76,6 +80,8 @@ func hackGoMod(repoPath string) (err error) {
 	content, err = parsedFile.Format()
 	if err == nil {
 		err = os.WriteFile(modPath, content, 0644)
+	} else {
+		err = errors2.Wrap(err, 1)
 	}
 
 	return
@@ -88,6 +94,9 @@ func unHackGoMod(repoPath string) (err error) {
 	if err == nil {
 		err = os.Remove(modBackupPath)
 	}
+	if err != nil {
+		err = errors2.Wrap(err, 1)
+	}
 	return
 }
 
@@ -98,11 +107,12 @@ func getCurrentModuleName() (moduleName string, err error) {
 	cmd.Stdout = &out
 	err = cmd.Run()
 	if err != nil {
+		err = errors2.Wrap(err, 1)
 		return
 	}
 
 	// Extract the module name from the output
-	moduleName = out.String()
+	moduleName = strings.Split(out.String(), "\n")[0]
 
 	return
 }

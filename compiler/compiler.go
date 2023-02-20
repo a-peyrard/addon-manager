@@ -3,6 +3,7 @@ package compiler
 import (
 	"bufio"
 	"fmt"
+	errors2 "github.com/go-errors/errors"
 	"log"
 	"os"
 	"os/exec"
@@ -102,10 +103,12 @@ func execCompilationCommand(repoPath string, commandArgs []string) (err error) {
 	var currentPath string
 	currentPath, err = os.Getwd()
 	if err != nil {
+		err = errors2.Wrap(err, 1)
 		return
 	}
 	// let's execute the command at the root directory of the addon repository
 	if err = os.Chdir(repoPath); err != nil {
+		err = errors2.Wrap(err, 1)
 		return
 	}
 	defer func() {
@@ -116,6 +119,10 @@ func execCompilationCommand(repoPath string, commandArgs []string) (err error) {
 	stdout, _ := cmd.StdoutPipe()
 	stderr, _ := cmd.StderrPipe()
 	err = cmd.Start()
+	if err != nil {
+		err = errors2.Wrap(err, 1)
+		return
+	}
 	scanner := bufio.NewScanner(stdout)
 	for scanner.Scan() {
 		// fixme: make the output better, maybe we shall capture this in a string, and only display it in case of
@@ -130,6 +137,9 @@ func execCompilationCommand(repoPath string, commandArgs []string) (err error) {
 		fmt.Println(scanner.Text())
 	}
 	err = cmd.Wait()
+	if err != nil {
+		err = errors2.Wrap(err, 1)
+	}
 
 	return
 }
