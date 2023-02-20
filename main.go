@@ -10,6 +10,7 @@ import (
 	"github.com/go-errors/errors"
 	"log"
 	"os"
+	"path/filepath"
 )
 
 func main() {
@@ -23,14 +24,25 @@ func main() {
 	if len(os.Args) > 2 {
 		version = os.Args[2]
 	}
+	currentDir, err := os.Getwd()
+	if err != nil {
+		log.Fatalf("unable to get current directory %+v", err)
+	}
+
 	localRepository := repository.NewLocalRepository("repo.private")
+	defaultCompiler := compiler.NewDefaultCompiler("/tmp/addon/buildOutput")
 	processLoader := loader.NewLoader[process.Process](&loader.Config{
 		Resolver: resolver.NewAnyResolver([]resolver.Resolver{
 			localRepository,
+			resolver.NewWorkspaceResolver(
+				filepath.Clean(filepath.Join(currentDir, "..")),
+				localRepository,
+				defaultCompiler,
+			),
 			resolver.NewRemoteGitResolver(
 				"/tmp/addon/gitResolver",
 				localRepository,
-				compiler.NewDefaultCompiler("/tmp/addon/buildOutput"),
+				defaultCompiler,
 			),
 		}),
 		FactoryMethod: "NewProcess",
